@@ -292,6 +292,8 @@
         const elGrid = document.getElementById('gridDimensions');
         const elWorkshopControls = document.getElementById('workshop-controls');
 
+        let gridDenom = null;
+
         // --- INIT ---
         initDefaultPizza();
         updateGridOptions();
@@ -409,6 +411,7 @@
                     n = parseInt(elNum.value) || 0;
                     d = parseInt(elDen.value) || 1;
                     document.getElementById('textError').style.display = 'none';
+                    updateGridOptions(d);
                 } else {
                     const parsed = parseFractionString(elFractionText.value);
                     if (parsed && parsed.d > 0) {
@@ -482,7 +485,7 @@
 
         // --- EVENT LISTENERS UI ---
         document.getElementById('numerator').addEventListener('input', draw);
-        document.getElementById('denominator').addEventListener('input', () => { updateGridOptions(); draw(); });
+        document.getElementById('denominator').addEventListener('input', draw);
         document.getElementById('fractionText').addEventListener('input', draw);
         document.getElementById('minWholes').addEventListener('input', draw);
         document.getElementById('randomize').addEventListener('change', draw);
@@ -490,6 +493,7 @@
         document.getElementById('bgColor').addEventListener('input', draw);
         
         elType.addEventListener('change', () => { updateUI(); draw(); });
+        elGrid.addEventListener('change', draw);
         
         document.getElementById('imgUpload').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -534,6 +538,9 @@
 
         function updateGridOptions(forceDenom) {
             const d = forceDenom || parseInt(elDen.value) || 1;
+            // Only rebuild when the denominator changed, so the user's choice is kept
+            if (d === gridDenom) return;
+            gridDenom = d;
             elGrid.innerHTML = '';
             for (let i = 1; i <= d; i++) {
                 if (d % i === 0) {
